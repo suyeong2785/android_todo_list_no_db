@@ -32,7 +32,7 @@
         android:hint="할일 제목"
         android:text="제목"
         android:textSize="20sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/item_todo__btnShowModify"
@@ -55,9 +55,9 @@
         android:insetLeft="0dp"
         android:insetRight="0dp"
         android:minWidth="0sp"
+        android:visibility="gone"
         app:iconGravity="textStart"
-        app:iconPadding="0dp"
-        android:visibility="gone"/>
+        app:iconPadding="0dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/item_todo__btnModify"
@@ -68,9 +68,9 @@
         android:insetLeft="0dp"
         android:insetRight="0dp"
         android:minWidth="0sp"
+        android:visibility="gone"
         app:iconGravity="textStart"
-        app:iconPadding="0dp"
-        android:visibility="gone"/>
+        app:iconPadding="0dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/item_todo__btnDelete"

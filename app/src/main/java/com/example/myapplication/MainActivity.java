@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -11,8 +10,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,30 +19,28 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextTodo;
     private List<Todo> todos;
     private int todosLastId;
-    private TodoAdapter listViewTodoAdapter;
-    private int index;
+    private TodoAdapter todoAdapter;
 
-    private void addTodo(String title) {
-        Todo newTodo = new Todo(++todosLastId, title);
-        todos.add(newTodo);
-        listViewTodoAdapter.notifyDataSetChanged();
+    private void addTodo(String newTodoTitle) {
+        Todo newTodo = new Todo(++todosLastId, newTodoTitle);
+        todos.add(0, newTodo);
+        todoAdapter.notifyDataSetChanged();
     }
 
-    private void deleteTodo(int indexToDelete) {
-        todos.remove(indexToDelete);
-        listViewTodoAdapter.notifyDataSetChanged();
+    private void deleteTodo(int index) {
+        todos.remove(index);
+        todoAdapter.notifyDataSetChanged();
     }
 
-    private void deleteAllTodo() {
+    private void deleteAllTodos() {
         todos.clear();
-        listViewTodoAdapter.notifyDataSetChanged();
+        todoAdapter.notifyDataSetChanged();
     }
 
     private void makeTestData() {
         for (int i = 0; i < 100; i++) {
-            addTodo("할일" + (i + 1));
+            addTodo("할일 " + (i + 1));
         }
-
     }
 
     @Override
@@ -62,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listViewTodo = findViewById(R.id.main_activity__listViewTodo);
 
-        View.OnClickListener btnDeleteClicked = view -> {
+        View.OnClickListener onBtnDeleteClicked = view -> {
             final int indexToDelete = (int) view.getTag();
 
             DialogInterface.OnClickListener onClickListener = (dialog, which) -> {
@@ -80,36 +75,39 @@ public class MainActivity extends AppCompatActivity {
                     .setPositiveButton("예", onClickListener)
                     .setNegativeButton("아니오", onClickListener)
                     .show();
-
         };
 
-        View.OnClickListener btnDetailClicked = view -> {
-            final int indexToDelete = (int) view.getTag();
+        View.OnClickListener onBtnDetailClicked = view -> {
+            final int indexToDetail = (int) view.getTag();
             Intent intent = new Intent(this, DetailActivity.class);
-            Todo todo = todos.get(indexToDelete);
+            Todo todo = todos.get(indexToDetail);
             intent.putExtra("todoId", todo.getId());
             intent.putExtra("todoTitle", todo.getTitle());
             startActivity(intent);
         };
 
-        View.OnClickListener btnShowModifyClicked = view -> {
-            Toast.makeText(this,"수정시작", Toast.LENGTH_SHORT).show();
+        View.OnClickListener onBtnShowModifyClicked = view -> {
+            View itemView = (View)view.getParent();
+
+            itemView.findViewById(R.id.item_todo__textViewTitle).setVisibility(View.GONE);
+            itemView.findViewById(R.id.item_todo__editTextTitle).setVisibility(View.VISIBLE);
+
+            Toast.makeText(this, "수정시작", Toast.LENGTH_SHORT).show();
         };
 
-        View.OnClickListener btnModifyClicked = view -> {
-            Toast.makeText(this,"수정적용", Toast.LENGTH_SHORT).show();
-
+        View.OnClickListener onBtnModifyClicked = view -> {
+            Toast.makeText(this, "수정완료", Toast.LENGTH_SHORT).show();
         };
 
-        View.OnClickListener btnCancelModifyClicked = view -> {
-            Toast.makeText(this,"수정취소", Toast.LENGTH_SHORT).show();
+        View.OnClickListener onBtnCancelModifyClicked = view -> {
+            Toast.makeText(this, "수정취소", Toast.LENGTH_SHORT).show();
         };
 
-        listViewTodoAdapter = new TodoAdapter(todos, btnDeleteClicked, btnDetailClicked, btnShowModifyClicked, btnModifyClicked, btnCancelModifyClicked);
-        listViewTodo.setAdapter(listViewTodoAdapter);
+        todoAdapter = new TodoAdapter(todos, onBtnDeleteClicked, onBtnDetailClicked, onBtnShowModifyClicked, onBtnModifyClicked, onBtnCancelModifyClicked);
 
-        makeTestData();
+        listViewTodo.setAdapter(todoAdapter);
 
+        makeTestData(); // 임시
     }
 
     public void btnAddTodoClicked(View view) {
@@ -127,20 +125,19 @@ public class MainActivity extends AppCompatActivity {
 
         editTextTodo.setText("");
         editTextTodo.requestFocus();
-
-        Log.d(TAG, "todos : " + todos);
     }
 
     public void btnDeleteAllTodosClicked(View view) {
         if (todos.size() == 0) {
-            Toast.makeText(this, "삭제할 리스트가 없습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "할일이 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         DialogInterface.OnClickListener onClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    deleteAllTodo();
+                    deleteAllTodos();
+                    Toast.makeText(this, "모든 할일이 삭제되었습니다.", Toast.LENGTH_SHORT).show();
                     break;
                 case DialogInterface.BUTTON_NEGATIVE:
                     break;
@@ -152,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("예", onClickListener)
                 .setNegativeButton("아니오", onClickListener)
                 .show();
-
     }
 
     public void btnFinishAppClicked(View view) {
